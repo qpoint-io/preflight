@@ -1,0 +1,23 @@
+name: Lint
+
+on:
+
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  shellcheck:
+    name: Lint Shell Script
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: ShellCheck
+      uses: ludeeus/action-shellcheck@master
+      with:
+        scandir: './preflight.sh'
+        severity: error 

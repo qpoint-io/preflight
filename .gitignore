@@ -1,0 +1,18 @@
+# Build and temporary files
+*.log
+*.tmp
+checksum.txt
+
+# Development environment
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+.devcontainer/
+.docker/
+
+# System files
+.DS_Store
+Thumbs.db
