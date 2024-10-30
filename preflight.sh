@@ -191,8 +191,7 @@ check_root() {
             "FAIL" \
             "non-root" \
             "root" \
-            "This script must be run with root privileges. Please run with: sudo $0" \
-            "https://docs.example.com/root-requirements"
+            "This script must be run with root privileges. Please run with: sudo $0"
         critical_failure_exit
     fi
 }
