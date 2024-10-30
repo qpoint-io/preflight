@@ -233,11 +233,12 @@ check_lockdown() {
             "none" \
             "Kernel lockdown file not found" \
             "https://docs.qpoint.io/qtap/troubleshooting/linux-kernel-lockdown-for-ebpf-applications"
-		SYSTEM_SETTINGS["Kernel Lockdown"]=$current_mode
+        SYSTEM_SETTINGS["Kernel Lockdown"]=$current_mode
         return
     fi
 
-    current_mode=$(cat "$lockdown_file")
+    # Extract the mode surrounded by square brackets using grep and sed
+    current_mode=$(grep -o '\[\w\+\]' "$lockdown_file" | sed 's/\[\(.*\)\]/\1/')
     SYSTEM_SETTINGS["Kernel Lockdown"]=$current_mode
 
     case $current_mode in
@@ -258,13 +259,22 @@ check_lockdown() {
                 "Some QPoint functionality may be restricted" \
                 "https://docs.qpoint.io/qtap/troubleshooting/linux-kernel-lockdown-for-ebpf-applications"
             ;;
-        *)
+        "confidentiality")
             collect_check_result \
                 "Kernel Lockdown" \
                 "FAIL" \
                 "$current_mode" \
                 "none" \
                 "Unsupported lockdown mode" \
+                "https://docs.qpoint.io/qtap/troubleshooting/linux-kernel-lockdown-for-ebpf-applications"
+            ;;
+        *)
+            collect_check_result \
+                "Kernel Lockdown" \
+                "FAIL" \
+                "$current_mode" \
+                "none" \
+                "Unknown lockdown mode" \
                 "https://docs.qpoint.io/qtap/troubleshooting/linux-kernel-lockdown-for-ebpf-applications"
             ;;
     esac
