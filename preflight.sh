@@ -320,9 +320,11 @@ collect_sysctl_bpf() {
         IFS='|' read -r param expected description <<< "$setting"
         current=$(sysctl -n "$param" 2>/dev/null || echo "not found")
         if [[ "$expected" == "-1" ]]; then
-            bpf_info+=" - $param\t= $current\n"
+            printf -v formatted_line " - %-35s = %s\n" "$param" "$current"
+            bpf_info+="$formatted_line"
         else
-            bpf_info+=" - $param\t= $current\t(recommended: $expected)\n"
+            printf -v formatted_line " - %-35s = %-10s (recommended: %s)\n" "$param" "$current" "$expected"
+            bpf_info+="$formatted_line"
         fi
     done
 
