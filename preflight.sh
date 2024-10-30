@@ -321,17 +321,22 @@ collect_sysctl_bpf() {
 
 # Check network interfaces
 check_network_interfaces() {
-    local ipv4_interfaces
-    local ipv6_interfaces
+    local ipv4_interfaces=""
+    local ipv6_interfaces=""
     
-    # Get IPv4 interfaces (excluding loopback and link-local)
-    ipv4_interfaces=$(ip -4 addr show | grep inet | grep -v '127.0.0.1' | awk '{print $NF ":" $2}')
+    # Try multiple methods to get network interfaces
+	if command -v ip >/dev/null 2>&1; then
+		# Use ip command if available
+		ipv4_interfaces=$(ip -4 addr show | grep inet | grep -v '127.0.0.1' | awk '{print $NF ":" $2}')
+		ipv6_interfaces=$(ip -6 addr show | grep inet6 | grep -v fe80 | grep -v '::1' | awk '{print $NF ":" $2}')
+	elif command -v ifconfig >/dev/null 2>&1; then
+		# Fallback to ifconfig
+		ipv4_interfaces=$(/sbin/ifconfig | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $NF ":" $2}')
+		ipv6_interfaces=$(/sbin/ifconfig | grep 'inet6' | grep -v 'fe80' | grep -v '::1' | awk '{print $NF ":" $6}')
+	fi
     
-    # Get IPv6 interfaces (excluding link-local fe80:: and loopback)
-    ipv6_interfaces=$(ip -6 addr show | grep inet6 | grep -v fe80 | grep -v '::1' | awk '{print $NF ":" $2}')
-    
-    SYSTEM_NETWORK["IPv4 Interfaces"]="${ipv4_interfaces:-None}"
-    SYSTEM_NETWORK["IPv6 Interfaces"]="${ipv6_interfaces:-None}"
+    SYSTEM_NETWORK["IPv4 Interfaces"]="${ipv4_interfaces:-None Detected}"
+    SYSTEM_NETWORK["IPv6 Interfaces"]="${ipv6_interfaces:-None Detected}"
 
     if [[ -z "$ipv4_interfaces" && -z "$ipv6_interfaces" ]]; then
         collect_check_result \
