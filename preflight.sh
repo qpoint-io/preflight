@@ -169,6 +169,7 @@ run_preflight_checks() {
 
     # Run all checks
     check_root
+    check_filesystem_readonly
     check_kernel
     check_lockdown
     check_cgroups_v2
@@ -391,6 +392,28 @@ check_network_interfaces() {
             "None" \
             "At least one interface" \
             "No IPv6 interfaces found"
+    fi
+}
+
+# Check filesystem access
+check_filesystem_readonly() {
+    local test_path="/tmp/rw_test_$$"
+    
+    if ! touch "$test_path" 2>/dev/null; then
+        collect_check_result \
+            "Filesystem Access" \
+            "WARN" \
+            "read-only" \
+            "read-write" \
+            "Filesystem is read-only. QPoint functionality may be limited."
+    else
+        rm -f "$test_path"
+        collect_check_result \
+            "Filesystem Access" \
+            "PASS" \
+            "read-write" \
+            "read-write" \
+            "Filesystem has write access"
     fi
 }
 

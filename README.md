@@ -5,6 +5,7 @@ A diagnostic tool that checks if your system meets the requirements for running 
 ## What it checks
 
 - Root privileges
+- Filesystem read-write status
 - Linux kernel version (≥ 5.10)
 - Kernel lockdown status
 - Cgroups v2 configuration

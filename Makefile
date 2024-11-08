@@ -1,4 +1,4 @@
-.PHONY: run fmt install-tools dev
+.PHONY: run fmt install-tools dev dev-readonly
 
 run:
 	@if [ "$$(uname -s)" != "Linux" ]; then \
@@ -18,6 +18,16 @@ dev:
 	docker build -t preflight-dev-env .
 	docker run --rm -it \
 		--privileged \
+		-v /sys:/sys \
+		-v "$(PWD):/workspace" \
+		-w /workspace \
+		preflight-dev-env bash
+
+dev-readonly:
+	docker build -t preflight-dev-env .
+	docker run --rm -it \
+		--privileged \
+		--read-only \
 		-v /sys:/sys \
 		-v "$(PWD):/workspace" \
 		-w /workspace \
